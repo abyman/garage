@@ -1,0 +1,9 @@
+//compiling lcdd
+gcc /home/pi/work/lcd.c -o /home/pi/work/lcdd -lmraa -std=gnu99
+
+// make bash script for starting / stoping daemon
+// move it to /etc/init.d/
+
+// Add lcdd to startup sequence
+sudo update-rc.d lcdd.sh defaults
+
