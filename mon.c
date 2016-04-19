@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
       if(update_log(d[0], d[1])) {
          syslog(LOG_ERR, " Oh no, could not open LOGFILE for writing");
       }
-      sleep(1);
+      sleep(10);
       cnt = (cnt + 1) % MEDIAN_LEN;
    }
    

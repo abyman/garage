@@ -8,7 +8,9 @@
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 <script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/boost.js"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/themes/dark-unica.js"></script>
 
 <script type="text/javascript">
    var chart;
@@ -29,13 +31,13 @@
                   text: '',
                   x: -20
                },
-               xAxis: {
-                     type: 'datetime',
-                     title: {
-                        text: 'Date'
-                     }
-               },
-               yAxis: {
+               xAxis: [{
+                  type: 'datetime',
+                  title: {
+                     text: 'Date'
+                  }
+               }],
+               yAxis: [{
                   title: {
                      text: 'Temp'
                   },
@@ -44,82 +46,7 @@
                      width: 1,
                      color: '#808080'
                   }]
-               },
-               tooltip: {
-                     headerFormat: '<b>{series.name}</b><br>',
-                     pointFormat: '{point.x:%e.%b %H:%M}: {point.y:.0f} C'
-               },
-               legend: {
-                  layout: 'vertical',
-                  align: 'right',
-                  verticalAlign: 'top',
-                  x: -10,
-                  y: 100,
-                  borderWidth: 0
-               },
-               plotOptions: {
-                     spline: {
-                        marker: {
-                           enabled: true
-                        }
-                     }
-               },
-               series: [{
-                  name: 'T'
-               }]
-            }
-            // Load data asynchronously using jQuery. On success, add the data
-            // to the options and initiate the chart.
-            // This data is obtained by exporting a GA custom report to TSV.
-            // http://api.jquery.com/jQuery.get/
-            jQuery.get('temp_data.php', null, function(tsv) {
-               var lines = [];
-               traffic = [];
-               try {
-                  // split the data return into lines and parse them
-                  tsv = tsv.split(/\n/g);
-                  jQuery.each(tsv, function(i, line) {
-                     line = line.split(/\t/);
-                     ds = line[0].split(/-/);
-                     ts = line[1].split(/:/);
-                     date = Date.parse(ds[0] + '-' + ds[1] + '-' + ds[2] + 'T' + ts[0] + ':' + ts[1]);
-                     traffic.push([
-                        date,
-                        parseInt(line[2].replace(',', ''), 10)
-                     ]);
-                  });
-               } catch (e) {  }
-               options.series[0].data = traffic;
-               chart = new Highcharts.Chart(options);
-            });
-         });
-</script>
-<script type="text/javascript">
-   var chart;
-         $(document).ready(function() {
-            var options = {
-               chart: {
-                  renderTo: 'h_container',
-                  type: 'spline',
-                  marginRight: 130,
-                  marginBottom: 25,
-                  zoomType: 'xy'
-               },
-               title: {
-                  text: 'Humidity',
-                  x: -20 //center
-               },
-               subtitle: {
-                  text: '',
-                  x: -20
-               },
-               xAxis: {
-                     type: 'datetime',
-                     title: {
-                        text: 'Date'
-                     }
-               },
-               yAxis: {
+               },{
                   title: {
                      text: 'RH %'
                   },
@@ -127,11 +54,12 @@
                      value: 0,
                      width: 1,
                      color: '#808080'
-                  }]
-               },
+                  }],
+                  opposite: true
+               }],
                tooltip: {
                      headerFormat: '<b>{series.name}</b><br>',
-                     pointFormat: '{point.x:%e.%b %H:%M}: {point.y:.0f} %'
+                     pointFormat: '{point.x:%e.%b %H:%M}: {point.y:.1f} C'
                },
                legend: {
                   layout: 'vertical',
@@ -144,21 +72,27 @@
                plotOptions: {
                      spline: {
                         marker: {
-                           enabled: true
+                           enabled: true,
+                           radius: 2
                         }
                      }
                },
                series: [{
-                  name: 'RH %'
+                  name: 'T',
+                  yAxis: 0
+               },{
+                  name: 'RH',
+                  yAxis: 1
                }]
             }
             // Load data asynchronously using jQuery. On success, add the data
             // to the options and initiate the chart.
             // This data is obtained by exporting a GA custom report to TSV.
             // http://api.jquery.com/jQuery.get/
-            jQuery.get('humi_data.php', null, function(tsv) {
+            jQuery.get("temp_data.php", "a=4", function(tsv) {
                var lines = [];
-               traffic = [];
+               tempD = [];
+               humiD = [];
                try {
                   // split the data return into lines and parse them
                   tsv = tsv.split(/\n/g);
@@ -167,13 +101,18 @@
                      ds = line[0].split(/-/);
                      ts = line[1].split(/:/);
                      date = Date.parse(ds[0] + '-' + ds[1] + '-' + ds[2] + 'T' + ts[0] + ':' + ts[1]);
-                     traffic.push([
+                     tempD.push([
                         date,
-                        parseInt(line[2].replace(',', ''), 10)
+                        parseFloat(line[2].replace(',', ''), 10)
+                     ]);
+                     humiD.push([
+                        date,
+                        parseFloat(line[3].replace(',', ''), 10)
                      ]);
                   });
                } catch (e) {  }
-               options.series[0].data = traffic;
+               options.series[0].data = tempD;
+               options.series[1].data = humiD;
                chart = new Highcharts.Chart(options);
             });
          });
@@ -181,8 +120,8 @@
 </head>
 <body>
 
-<div id="t_container" style="width: 100%; height: 400px; margin: 0 auto"></div>
-<div id="h_container" style="width: 100%; height: 400px; margin: 0 auto"></div>
+<div id="t_container" style="width: 90%; height: 400px; margin: 0 auto"></div>
+<div id="h_container" style="width: 90%; height: 400px; margin: 0 auto"></div>
                
 </body>
 </html>
